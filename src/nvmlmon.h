@@ -7,16 +7,16 @@
 #include <vector>
 #include <utility>
 #include <sys/types.h>
-
+#include "parameter.h"
 
 using monitored_value_map = std::map<std::string, unsigned long long>;
 using monitored_average_map = std::map<std::string, double>;
 using parameter_list = std::map<std::string, std::string>;
 
-
 //Map of classes that represent each monitored quantity
 struct nvml_process_stats {
-  double sm_util = 0;           // SM %
+  unsigned long long sm_util = 0;           // SM %
+  unsigned long long mem_util = 0;           // SM %
   unsigned long long fb_mem_used = 0; // Fb  bytes
   double gpu_mem_used_pct = 0.0;      // GPU %
 };
@@ -43,6 +43,7 @@ class nvmlmon {
   monitored_value_map const get_json_total_stats();
   monitored_average_map const get_json_average_stats(
       unsigned long long elapsed_clock_ticks);
+
   parameter_list const get_parameter_list();
 
   void const get_hardware_info(nlohmann::json& hw_json);
@@ -54,9 +55,9 @@ class nvmlmon {
   bool valid = false;
   unsigned int ngpus = 0;
   std::vector<nvml_device_info> devices;
-
+  std::vector<unsigned long long> last_ts_;
   // pid GPU statistics 
-  std::map<pid_t, nvml_process_stats> gpu_stats;
+  std::map<pid_t,  nvml_process_stats> gpu_stats;
 
   // GPU total fb memory usage MB
   std::map<unsigned int, double> device_total_fbmem_;
